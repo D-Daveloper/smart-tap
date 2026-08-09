@@ -1,26 +1,326 @@
 @import "tailwindcss";
+@import "./theme.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---------------------------------------------------------------
+   Keyframes — every one animates TRANSFORM ONLY, never opacity,
+   and none uses a fill-mode. A frame that never advances therefore
+   leaves the element at its natural, visible state. Opacity for
+   reveals is handled by a class JS always removes (see .reveal).
+   --------------------------------------------------------------- */
+@layer base {
+  @keyframes reveal-in {
+    from {
+      transform: translateY(16px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes star-pop {
+    0% {
+      transform: scale(0.4);
+    }
+    60% {
+      transform: scale(1.14);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes faq-in {
+    from {
+      transform: translateY(-6px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes wave-glow {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes tap-ring {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.45);
+      opacity: 0;
+    }
+  }
+  @keyframes ring-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(184, 80, 47, 0.42);
+    }
+    70% {
+      box-shadow: 0 0 0 13px rgba(184, 80, 47, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(184, 80, 47, 0);
+    }
+  }
+  @keyframes floaty {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-7px);
+    }
+  }
+  @keyframes draw-rule {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    scroll-behavior: smooth;
+  }
+  section[id] {
+    scroll-margin-top: 78px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------------------------------------------------------------
+   Classical component layer — only the parts this page uses.
+   --------------------------------------------------------------- */
+@layer components {
+  .plate {
+    box-sizing: border-box;
+    filter: sepia(0.22) saturate(0.82) contrast(1.05);
+    border: 6px solid var(--color-surface);
+    outline: 1px solid var(--color-divider);
+    transition:
+      transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+      box-shadow 0.5s ease;
+  }
+  [data-theme="dark"] .plate {
+    filter: none;
+  }
+  figure:hover > .plate {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .hr {
+    height: 1px;
+    border: 0;
+    margin: var(--space-4) 0;
+    background: var(--color-divider);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: var(--font-heading);
+    font-weight: var(--font-heading-weight);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    transition:
+      transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1),
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .btn svg {
+    display: block;
+  }
+  .btn:hover {
+    transform: translateY(-1.5px);
+  }
+  .btn:active {
+    transform: translateY(0);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-primary {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .btn-primary:hover {
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+  .btn-primary:active {
+    background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  }
+  .btn-secondary {
+    border-color: var(--color-divider);
+  }
+  .btn-secondary:hover {
+    background: color-mix(in srgb, var(--color-text) 7%, transparent);
+  }
+  .btn-secondary:active {
+    background: color-mix(in srgb, var(--color-text) 14%, transparent);
+  }
+  .btn-block {
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+
+  .field > label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  }
+  .input {
+    width: 100%;
+    min-height: 36px;
+    padding: 6px 10px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--color-text);
+    caret-color: var(--color-accent);
+    background: transparent;
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .input:hover {
+    border-color: color-mix(in srgb, var(--color-text) 45%, transparent);
+  }
+  .input:focus-visible {
+    border-color: var(--color-accent);
+    outline-offset: 0;
+    box-shadow: 0 0 0 3px
+      color-mix(in srgb, var(--color-accent) 16%, transparent);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    background: transparent;
+    border: 1px solid var(--color-divider);
+    transition:
+      transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+      border-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(
+      in srgb,
+      var(--color-accent) 50%,
+      var(--color-divider)
+    );
+    box-shadow: var(--shadow-md);
+  }
+  .card-kicker {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .card-title {
+    font-family: var(--font-heading);
+    font-weight: var(--font-heading-weight);
+    font-size: 17px;
+    line-height: 1.2;
+  }
+  .card-body {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.8;
+    flex: 1;
+  }
+  .elev-sm {
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Nav underline sweep */
+  .navlink {
+    position: relative;
+  }
+  .navlink::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 1px;
+    width: 100%;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .navlink:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Motion utilities
+   --------------------------------------------------------------- */
+@layer utilities {
+  /* `.is-hidden` is added by JS only after the observer has the node,
+     and is always removed — it can never strand server-rendered content. */
+  .reveal.is-hidden {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .reveal.is-in {
+    animation: reveal-in 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .star {
+      animation: star-pop 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .nfc-wave {
+      animation: wave-glow 2.6s ease-in-out infinite;
+    }
+    .tap-ring {
+      animation: tap-ring 2.8s ease-out infinite;
+    }
+    .tap-pulse {
+      animation: ring-pulse 2.8s ease-out infinite;
+    }
+    .floaty {
+      animation: floaty 6s ease-in-out infinite;
+    }
+    details[open] > .faq-answer {
+      animation: faq-in 0.34s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+  }
+
+  .faq-plus {
+    transition: transform 0.18s ease;
+  }
+  details[open] .faq-plus {
+    transform: rotate(45deg);
+  }
+  details summary {
+    transition: color 0.2s ease;
+  }
+  details summary:hover {
+    color: var(--color-accent-700);
+  }
 }

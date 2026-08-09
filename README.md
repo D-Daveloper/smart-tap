@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SmartTap — Next.js port
 
-## Getting Started
+App Router + TypeScript + Tailwind v4. Every section of the homepage is its own
+component so a change to pricing can't break the FAQ.
 
-First, run the development server:
-
-```bash
+```
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Layout
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/
+  layout.tsx          fonts, metadata, no-flash theme script, <LoadingScreen>
+  page.tsx            composes the sections in order — the whole page at a glance
+  globals.css         Tailwind + keyframes + the Classical component layer
+  theme.css           the design tokens (light/dark), from smarttap-theme.css
+components/
+  layout/             SiteHeader, SiteFooter
+  sections/           Hero, HowItWorks, WhatTheySee, PhoneMock, WhyItMatters,
+                      Formats, Pricing, Testimonial, Faq, LeadCapture
+  motion/             Reveal, CountUp, ScrollProgress
+  LoadingScreen.tsx   first-visit splash
+  ThemeToggle.tsx     dark/light switch
+  Plate.tsx           the matted photograph wrapper
+  icons.tsx           inlined Lucide paths — no icon dependency
+lib/
+  useReveal.ts        the scroll-reveal hook
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Only four components are client components: `ThemeToggle`, `LeadCapture`,
+`LoadingScreen`, and the `motion/` primitives. Everything else renders on the
+server, so the page ships as HTML and the motion is layered on top.
 
-## Learn More
+## Animation approach
 
-To learn more about Next.js, take a look at the following resources:
+**CSS keyframes + a thin IntersectionObserver hook. No animation library.**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Why, for this design specifically:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **The motion here is entrances and micro-states** — reveals, hovers, a
+   count-up, a few looping pulses. That is exactly what CSS does natively and
+   cheaply. Framer Motion would add ~35kB gzipped and force `"use client"` on
+   every section it touched, which would undo the component split's main
+   benefit.
+2. **Server components stay server components.** `Reveal` is a small client
+   wrapper around otherwise-static markup; the content inside it is still
+   server-rendered.
+3. **It degrades correctly.** This is the part that bit us in the prototype and
+   is now a hard rule in the code:
 
-## Deploy on Vercel
+   > The server ships every section **visible**. JS adds the hidden class only
+   > once the observer actually holds the node, and always removes it. Stagger
+   > is a `setTimeout`, not an `animation-delay`. No keyframe animates opacity
+   > with a fill-mode.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   The result: a failed hydration, a throttled tab, an old browser, or
+   `prefers-reduced-motion` all leave a perfectly readable page. Nothing can
+   get stranded invisible.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**When to reach for Framer Motion instead:** shared-element transitions between
+routes, drag interactions, spring-based gesture physics, or exit animations on
+unmounting lists — genuine layout animation. If the dashboard grows an animated
+chart or reorderable list, that's the moment. Adding it later is a per-component
+decision, not a rewrite.
+
+Every animated property is `transform` or `opacity` only, so nothing triggers
+layout.
+
+## Loading screen
+
+`components/LoadingScreen.tsx`. It is the colophon page of the design: paper
+ground, the NFC mark with its arcs pulsing outward, the wordmark in Cormorant,
+and a gold hairline that fills left to right.
+
+Rules it enforces:
+
+- **First visit only** (`sessionStorage`) — a repeat visitor never waits.
+- **Minimum 900ms** so it reads as deliberate rather than a flicker.
+- **Hard ceiling of 2600ms** — it can never trap the page behind itself.
+- Page content is in the DOM underneath the whole time, so crawlers and no-JS
+  readers are unaffected.
+- Respects `prefers-reduced-motion` (static mark, no rule fill).
+
+Tune `MIN_MS` / `MAX_MS` at the top of the file. To show it on every visit
+rather than once per session, delete the two `sessionStorage` lines.
+
+## Theme switching
+
+`theme.css` defines semantic tokens on `:root` and swaps them under
+`[data-theme="dark"]`. `@theme inline` re-exports them, so `bg-bg`,
+`text-accent-700`, `border-divider` and friends follow the mode with no `dark:`
+prefix anywhere. The `dark:` variant is still defined for one-off overrides.
+
+The inline script in `layout.tsx` sets `data-theme` before first paint, so a
+dark-mode visitor never sees a white flash.
+
+## Placeholders still open
+
+Prices (₦15,000 / ₦2,500 / ₦25,000), the "40 shops" trust figure, the Tunde A.
+testimonial, the phone number, and all photographs (`<Plate>` renders a labelled
+placeholder until you pass a `next/image` child).
