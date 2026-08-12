@@ -25,13 +25,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label="Switch colour mode"
       title="Switch colour mode"
-      className="inline-flex cursor-pointer items-center gap-1.75 rounded-md border px-2.75 py-1.75 text-[12.5px] leading-none transition-colors hover:border-accent hover:text-accent-700"
-      style={{
-        borderColor: "var(--color-divider)",
-        color: "var(--color-text)",
-        fontFamily: "var(--font-body)",
-        background: "transparent",
-      }}
+      className="inline-flex cursor-pointer items-center gap-1.75 rounded-md border px-2.75 py-1.75 text-[12.5px] leading-none transition-colors hover:border-accent hover:text-accent-700 border-divider text-text font-body bg-transparent"
     >
       {isLight ? <MoonIcon /> : <SunIcon />}
       <span>{isLight ? "Dark" : "Light"}</span>

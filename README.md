@@ -14,12 +14,17 @@ npm run dev
 app/
   layout.tsx          fonts, metadata, no-flash theme script, <LoadingScreen>
   page.tsx            composes the sections in order — the whole page at a glance
+  login/page.tsx      owner login — form beside a colophon panel
+  dashboard/page.tsx  the business dashboard (mounts <DashboardShell>)
   globals.css         Tailwind + keyframes + the Classical component layer
   theme.css           the design tokens (light/dark), from smarttap-theme.css
 components/
   layout/             SiteHeader, SiteFooter
   sections/           Hero, HowItWorks, WhatTheySee, PhoneMock, WhyItMatters,
                       Formats, Pricing, Testimonial, Faq, LeadCapture
+  auth/               LoginForm
+  dashboard/          DashboardShell, Overview, EditPage, PhonePreview,
+                      LookLayout, BillingPlan, ShopSettings
   motion/             Reveal, CountUp, ScrollProgress
   LoadingScreen.tsx   first-visit splash
   ThemeToggle.tsx     dark/light switch
@@ -27,7 +32,20 @@ components/
   icons.tsx           inlined Lucide paths — no icon dependency
 lib/
   useReveal.ts        the scroll-reveal hook
+  dashboard.ts        ranges, cards, presets, fonts, funnel maths, demo data
+  useShop.ts          all dashboard state + the autosave mark
 ```
+
+## Dashboard
+
+`/dashboard` is one client tree: `useShop` owns every piece of state and each
+page is a presentational component under `components/dashboard/`. There is no
+Save button — every mutation calls `touch()`, which drives the "Saved just now"
+mark in the header.
+
+The demo-state bar at the top switches between an established shop and the
+first-week state (averages across comparable shops instead of a chart). Delete
+that row when the dashboard is wired to real data.
 
 Only four components are client components: `ThemeToggle`, `LeadCapture`,
 `LoadingScreen`, and the `motion/` primitives. Everything else renders on the
