@@ -373,6 +373,7 @@
   }
   .sec-head {
     transition: background-color 0.2s ease;
+    border-radius: 16px;
   }
   .sec-head:hover {
     background: color-mix(in srgb, var(--color-accent) 5%, transparent);

@@ -37,7 +37,7 @@ export function DashboardShell() {
             pulse={true}
           />
         </div>
-        <div className=" grid grid-cols-4 items-start gap-[clamp(30px,5vw,60px)] px-[clamp(20px,5vw,40px)] py-10">
+        <div className=" grid md:grid-cols-3 grid-cols-1 xl:grid-cols-4  items-start gap-[clamp(30px,5vw,60px)] px-[clamp(20px,5vw,40px)] py-10">
           <ProfileCard />
           <ProfileCard />
           <ProfileCard />

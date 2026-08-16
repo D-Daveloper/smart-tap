@@ -27,7 +27,7 @@ export const ProfileCard = () => {
             </p>
           </div>
         </div>
-        <div className="flex justify-between items-center gap-2">
+        <div className="flex items-center gap-2">
           <BasicButton
             onClick={() => {}}
             label="Edit"
@@ -49,7 +49,7 @@ export const ProfileCard = () => {
             Get your SmartTap
           </a>
         </div>
-        <div className="flex justify-between items-center gap-3.5">
+        <div className="flex items-center gap-3.5">
           <BasicButton
             onClick={() => {}}
             // label="Add profile"

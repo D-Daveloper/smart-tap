@@ -37,7 +37,8 @@
 
     /* Type — the *-face vars are supplied by next/font in app/layout.tsx.
        The literal names are the fallback when the fonts are loaded by <link>. */
-    --font-heading: var(--font-heading-face, "Cormorant Garamond"), system-ui, sans-serif;
+    --font-heading:
+      var(--font-heading-face, "Cormorant Garamond"), system-ui, sans-serif;
     --font-body: var(--font-body-face, "Lora"), system-ui, sans-serif;
     --font-heading-weight: 600;
 
@@ -152,9 +153,9 @@
     --color-accent-2-800: #f0c78f;
     --color-accent-2-900: #ffe3bf;
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .55);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, .6);
-    --shadow-lg: 0 14px 36px rgba(0, 0, 0, .66);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.55);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 14px 36px rgba(0, 0, 0, 0.66);
   }
 }
 
@@ -207,22 +208,37 @@
    Base
    --------------------------------------------------------------- */
 @layer base {
+  :root {
+    scrollbar-color: var(--color-accent) var(--color-bg); /* Thumb color, Track color */
+    scrollbar-width: thin;
+  }
   body {
     background: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-body);
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading);
     font-weight: var(--font-heading-weight);
   }
 
   /* Display sizes set lighter than interface headings */
-  h1 { font-weight: 400; }
+  h1 {
+    font-weight: 400;
+  }
 
-  a { color: var(--color-accent-700); }
-  a:hover { color: var(--color-accent-600); }
+  a {
+    color: var(--color-accent-700);
+  }
+  a:hover {
+    color: var(--color-accent-600);
+  }
 
   :focus-visible {
     outline: 2px solid var(--color-accent);
@@ -234,5 +250,7 @@
   }
 
   /* Photographs are matted, and the archival grade is dropped on dark */
-  [data-theme="dark"] .plate { filter: none; }
+  [data-theme="dark"] .plate {
+    filter: none;
+  }
 }
